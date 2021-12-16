@@ -1,18 +1,19 @@
 const Koa = require("koa");
 const koaBody = require("koa-body");
 const cors = require("@koa/cors");
-const Router = require("koa-router");
-const { v4: uuidv4 } = require('uuid');
+const router = require("koa-router");
+
+const { v4: uuidv4 } = require("uuid");
 const TicketConstructor = require("./src/TicketConstructor");
-const ticketList = [];
-const ctrl = new TicketConstructor(ticketList);
+//const ticketList = [];
+const ctrl = new TicketConstructor();
 const { Ticket, TicketFull } = require("./src/Ticket");
 
 const app = new Koa();
-const PORT = process.env.PORT || 8000;
-let router = new Router(); //Instantiate the router
+const PORT = process.env.PORT || 9000;
 
 app.use(cors());
+
 app.use(koaBody({ text: true, urlencoded: true, json: true, multipart: true }));
 
 
@@ -22,7 +23,8 @@ app.use(async (ctx, next) => {
   if (!origin) {
     return await next();
   }
-  const headers = { "Access-Control-Allow-Origin": "*" };
+
+  const headers = { "Access-Control-Allow-Origin": "*" };//сервер может быть вызван из любого источника
   if (ctx.request.method !== "OPTIONS") {
     ctx.response.set({ ...headers });
     try {
@@ -46,14 +48,16 @@ app.use(async (ctx, next) => {
     ctx.response.status = 204; // No content
   }
 });
-app.use(router.routes()).use(router.allowedMethods());
 
-app.use(async (ctx) => {
+
+
+ app.use(async (ctx) => {
   const { method, id } = ctx.request.query;
+  console.log(ctx.request.query)
   switch (method) {
     case "getStartedTickets":
       try {
-        const result = ctrl.getStartedTickets()
+        const result = ctrl.getStartedTickets();
         ctx.response.body = result;
         return;
       } catch (err) {
@@ -63,15 +67,16 @@ app.use(async (ctx) => {
       try {
         const result = ctrl.allTickets();
         ctx.response.body = result;
-        console.log(result)
+        
       } catch (err) {
         console.error(err);
       }
       return;
     case "createTicket":
       try {
-        const { name, description } = ctx.request.body;
-        const result = ctrl.createTicket(name, description);
+        const object = ctx.request.body;
+        console.log(ctx.request.body, 'ctx.request.body')
+        const result = ctrl.createTicket(object);
         ctx.response.body = result;
       } catch (err) {
         console.error(err);

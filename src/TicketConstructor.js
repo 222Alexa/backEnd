@@ -1,35 +1,29 @@
+
+const { v4: uuidv4 } = require("uuid");
 const { Ticket, TicketFull } = require("./Ticket");
 
 class TicketConstructor {
-  constructor(ticketsArr) {
-    this.ticketsArr = ticketsArr; //это массив тикетов
+  constructor() {
+    this.ticketsArr = []; //это массив тикетов
   }
   allTickets() {
-    return this.ticketsArr.map((elem) => new Ticket(elem));
+    return this.ticketsArr.map(elem => new Ticket(elem.id, elem.name, elem.status, elem.created));
   }
 
   getStartedTickets() {
     const ticket1 = new TicketFull(
-     "name",
-      
-      new Date().toLocaleString(),
-      "description"
-    );
-    const ticket2 = new TicketFull(
-      "name2",
-      
-      new Date().toLocaleString(),
-      "description2"
-    );
-    this.ticketsArr = [ticket1, ticket2];
+     "name","description");
+
+    this.ticketsArr.push(ticket1);
     return this.ticketsArr;
   }
-
-  createTicket(name, description) {
+  
+  createTicket(object) {
     const ticket = new TicketFull(
-      name,
-      new Date().toLocaleString(),
-      description
+     
+      object.name,
+      
+      object.description
     );
 
     this.ticketsArr.push(ticket);
@@ -52,5 +46,4 @@ class TicketConstructor {
     return !!this.ticketsArr.splice(item, 1);
   }
 }
-
 module.exports = TicketConstructor;
